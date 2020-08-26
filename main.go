@@ -178,6 +178,18 @@ func getSelfID() (string, error) {
 	return fmt.Sprint(bot.Self.ID), nil
 }
 
+func getPlatformID() (string, error) {
+	return "Telegram", nil
+}
+
+func getGroupList() ([]string, error) {
+	return nil, errors.New("not supported")
+}
+
+func getMemberList(id string) ([]string, error) {
+	return nil, errors.New("not supported")
+}
+
 type tgEntitiesInUTF8 struct {
 	ubot.MsgEntity
 	Start int
@@ -315,6 +327,9 @@ func main() {
 			GetMemberName:   getMemberName,
 			GetUserAvatar:   getUserAvatar,
 			GetSelfID:       getSelfID,
+			GetPlatformID:   getPlatformID,
+			GetGroupList:    getGroupList,
+			GetMemberList:   getMemberList,
 		}
 	})
 	ubot.AssertNoError(err)
