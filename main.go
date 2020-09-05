@@ -28,12 +28,6 @@ func getGroupName(id string) (string, error) {
 func getUserName(id string) (string, error) {
 	return "", errors.New("not supported")
 }
-func login() error {
-	return errors.New("not supported")
-}
-func logout() error {
-	return errors.New("not supported")
-}
 func markdownEscaped(s string) string {
 	data := strings.ReplaceAll(s, `\`, `\\`)
 	data = strings.ReplaceAll(data, `*`, `\*`)
@@ -318,8 +312,6 @@ func main() {
 		return &ubot.Account{
 			GetGroupName:    getGroupName,
 			GetUserName:     getUserName,
-			Login:           login,
-			Logout:          logout,
 			SendChatMessage: sendChatMessage,
 			RemoveMember:    removeMember,
 			ShutupMember:    shutupMember,
@@ -333,5 +325,4 @@ func main() {
 		}
 	})
 	ubot.AssertNoError(err)
-	_ = logout()
 }
