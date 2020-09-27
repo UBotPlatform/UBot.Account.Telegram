@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -8,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 	"unicode/utf16"
 	"unicode/utf8"
 
@@ -59,13 +61,34 @@ func sendChatMessage(msgType ubot.MsgType, source string, target string, message
 				continue
 			}
 			defer resp.Body.Close()
-			bytes, err := ioutil.ReadAll(resp.Body)
+			binary, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
 				continue
 			}
 			photoMsg := tgbotapi.NewPhotoUpload(iSource, tgbotapi.FileBytes{
-				Name:  "ubot_image.png",
-				Bytes: bytes})
+				Name: fmt.Sprintf(
+					"image-%d%s",
+					time.Now().UnixNano(),
+					guessImageExtByMIMEType(resp.Header.Get("Content-Type"), ".png")),
+				Bytes: binary})
+			packets = append(packets, photoMsg)
+		case "image_base64":
+			if rawMsg.Len() != 0 {
+				msg := tgbotapi.NewMessageToChannel(source, rawMsg.String())
+				msg.ParseMode = "MarkdownV2"
+				packets = append(packets, msg)
+				rawMsg.Reset()
+			}
+			binary, err := base64.StdEncoding.DecodeString(entity.Data)
+			if err != nil {
+				continue
+			}
+			photoMsg := tgbotapi.NewPhotoUpload(iSource, tgbotapi.FileBytes{
+				Name: fmt.Sprintf(
+					"image-%d%s",
+					time.Now().UnixNano(),
+					guessImageExtByBytes(binary, ".png")),
+				Bytes: binary})
 			packets = append(packets, photoMsg)
 		case "text":
 			rawMsg.WriteString(markdownEscaped(entity.Data))
