@@ -40,6 +40,7 @@ func markdownEscaped(s string) string {
 	data = strings.ReplaceAll(data, `]`, `\]`)
 	data = strings.ReplaceAll(data, `(`, `\(`)
 	data = strings.ReplaceAll(data, `)`, `\)`)
+	data = strings.ReplaceAll(data, `!`, `\!`)
 	return data
 }
 func sendChatMessage(msgType ubot.MsgType, source string, target string, message string) error {
