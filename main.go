@@ -50,52 +50,52 @@ func sendChatMessage(msgType ubot.MsgType, source string, target string, message
 	packets := make([]tgbotapi.Chattable, 0, 1)
 	for _, entity := range entities {
 		switch entity.Type {
-		case "image_online":
+		case "image":
 			if rawMsg.Len() != 0 {
 				msg := tgbotapi.NewMessageToChannel(source, rawMsg.String())
 				msg.ParseMode = "MarkdownV2"
 				packets = append(packets, msg)
 				rawMsg.Reset()
 			}
-			resp, err := http.Get(entity.Data)
-			if err != nil {
-				continue
+			var photoMsg tgbotapi.PhotoConfig
+			telegramFileId, useExisting := entity.NamedArgs["telegram_file_id"]
+			if useExisting {
+				photoMsg = tgbotapi.NewPhotoShare(iSource, telegramFileId)
+			} else {
+				var imageBinary []byte
+				var imageExt string
+				var err error
+				imageBase64, useBase64 := entity.NamedArgs["base64"]
+				if useBase64 {
+					imageBinary, err = base64.StdEncoding.DecodeString(imageBase64)
+					imageExt = guessImageExtByBytes(imageBinary, ".png")
+				} else {
+					var resp *http.Response
+					resp, err = http.Get(entity.FirstArgOrEmpty())
+					if err != nil {
+						continue
+					}
+					imageBinary, err = ioutil.ReadAll(resp.Body)
+					imageExt = guessImageExtByMIMEType(resp.Header.Get("Content-Type"), "")
+					_ = resp.Body.Close()
+					if imageExt == "" {
+						imageExt = guessImageExtByBytes(imageBinary, ".png")
+					}
+				}
+				if err != nil {
+					continue
+				}
+				photoMsg = tgbotapi.NewPhotoUpload(iSource, tgbotapi.FileBytes{
+					Name:  fmt.Sprintf("image-%d%s", time.Now().UnixNano(), imageExt),
+					Bytes: imageBinary})
 			}
-			defer resp.Body.Close()
-			binary, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				continue
-			}
-			photoMsg := tgbotapi.NewPhotoUpload(iSource, tgbotapi.FileBytes{
-				Name: fmt.Sprintf(
-					"image-%d%s",
-					time.Now().UnixNano(),
-					guessImageExtByMIMEType(resp.Header.Get("Content-Type"), ".png")),
-				Bytes: binary})
-			packets = append(packets, photoMsg)
-		case "image_base64":
-			if rawMsg.Len() != 0 {
-				msg := tgbotapi.NewMessageToChannel(source, rawMsg.String())
-				msg.ParseMode = "MarkdownV2"
-				packets = append(packets, msg)
-				rawMsg.Reset()
-			}
-			binary, err := base64.StdEncoding.DecodeString(entity.Data)
-			if err != nil {
-				continue
-			}
-			photoMsg := tgbotapi.NewPhotoUpload(iSource, tgbotapi.FileBytes{
-				Name: fmt.Sprintf(
-					"image-%d%s",
-					time.Now().UnixNano(),
-					guessImageExtByBytes(binary, ".png")),
-				Bytes: binary})
 			packets = append(packets, photoMsg)
 		case "text":
-			rawMsg.WriteString(markdownEscaped(entity.Data))
+			rawMsg.WriteString(markdownEscaped(entity.FirstArgOrEmpty()))
 		case "at":
-			if len(entity.Data) > 0 && entity.Data[0] == '@' {
-				rawMsg.WriteString(entity.Data)
+			atTarget := entity.FirstArgOrEmpty()
+			if len(atTarget) > 0 && atTarget[0] == '@' {
+				rawMsg.WriteString(atTarget)
 				continue
 			}
 			atUser, err := strconv.Atoi(target)
@@ -238,9 +238,15 @@ func receiveTGMessage(message *tgbotapi.Message) {
 		photoFile, err := bot.GetFile(tgbotapi.FileConfig{FileID: photos[len(photos)-1].FileID})
 		if err == nil {
 			myEntities = append(myEntities, &tgEntitiesInUTF8{
-				MsgEntity: ubot.MsgEntity{Type: "image_online", Data: photoFile.Link(bot.Token)},
-				Start:     0,
-				End:       0})
+				MsgEntity: ubot.MsgEntity{
+					Type: "image",
+					Args: []string{photoFile.Link(bot.Token)},
+					NamedArgs: map[string]string{
+						"telegram_file_id": photoFile.FileID,
+					},
+				},
+				Start: 0,
+				End:   0})
 		}
 	}
 	msgText := message.Text
@@ -279,7 +285,7 @@ func receiveTGMessage(message *tgbotapi.Message) {
 			case "mention":
 				username := msgText[start:end]
 				myEntities = append(myEntities, &tgEntitiesInUTF8{
-					MsgEntity: ubot.MsgEntity{Type: "at", Data: username},
+					MsgEntity: ubot.MsgEntity{Type: "at", Args: []string{username}},
 					Start:     start,
 					End:       end})
 			case "text_mention":
@@ -287,7 +293,7 @@ func receiveTGMessage(message *tgbotapi.Message) {
 					continue
 				}
 				myEntities = append(myEntities, &tgEntitiesInUTF8{
-					MsgEntity: ubot.MsgEntity{Type: "at", Data: fmt.Sprint(entity.User.ID)},
+					MsgEntity: ubot.MsgEntity{Type: "at", Args: []string{fmt.Sprint(entity.User.ID)}},
 					Start:     start,
 					End:       end})
 			}
