@@ -1,9 +1,9 @@
 github.com/1354092549/wsrpc v0.3.2 h1:6uaXV++oMm/J89LcnVAbtCTawX7W5y8K8cWqRiDp5SQ=
 github.com/1354092549/wsrpc v0.3.2/go.mod h1:rWsn6JBtSbbM4h80KWkdvI2m2M57tLmhihqNEbv64Fg=
-github.com/UBotPlatform/UBot.Common.Go v0.0.0-20210609040223-e66e6d90d589 h1:Ro7UtzkGZduWZx7MAJpXEoenqLbJl0BaIUUNdbFDwcQ=
-github.com/UBotPlatform/UBot.Common.Go v0.0.0-20210609040223-e66e6d90d589/go.mod h1:ewUF1R7vqx6SA2FoZ6hje9ED2uyRsh6nnrWFCuZqprs=
-github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible h1:2cauKuaELYAEARXRkq2LrJ0yDDv1rW7+wrTEdVL3uaU=
-github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible/go.mod h1:qf9acutJ8cwBUhm1bqgz6Bei9/C/c93FPDljKWwsOgM=
+github.com/UBotPlatform/UBot.Common.Go v0.0.0-20210613112529-8e472ab84743 h1:NSvQLb+lLTQnpQLVBw+Oh50FO6TqxWQtDL0kocVtV1M=
+github.com/UBotPlatform/UBot.Common.Go v0.0.0-20210613112529-8e472ab84743/go.mod h1:ewUF1R7vqx6SA2FoZ6hje9ED2uyRsh6nnrWFCuZqprs=
+github.com/go-telegram-bot-api/telegram-bot-api v1.0.1-0.20201020035208-b6df6c273aa8 h1:uHdsdgQzKx0t31af38n7rtLZGv+UjKZEo4hGjrbuu8I=
+github.com/go-telegram-bot-api/telegram-bot-api v1.0.1-0.20201020035208-b6df6c273aa8/go.mod h1:lDm2E64X4OjFdBUA4hlN4mEvbSitvhJdKw7rsA8KHgI=
 github.com/gorilla/websocket v1.4.2 h1:+/TMaTYc4QFitKJxsQ7Yye35DkWvkdLcvGKqM+x0Ufc=
 github.com/gorilla/websocket v1.4.2/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/technoweenie/multipartstreamer v1.0.1 h1:XRztA5MXiR1TIRHxH2uNxXxaIkKQDeX7m2XsSOlQEnM=
