@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -75,7 +75,7 @@ func sendChatMessage(msgType ubot.MsgType, source string, target string, message
 					if err != nil {
 						continue
 					}
-					imageBinary, err = ioutil.ReadAll(resp.Body)
+					imageBinary, err = io.ReadAll(resp.Body)
 					imageExt = guessImageExtByMIMEType(resp.Header.Get("Content-Type"), "")
 					_ = resp.Body.Close()
 					if imageExt == "" {
